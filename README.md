@@ -1,47 +1,30 @@
-# shu-ha-ri--docs
+# Shu Ha Ri Engine Docs
 
-This is a Next.js application generated with
-[Create Fumadocs](https://github.com/fuma-nama/fumadocs).
+Documentation site for [Shu Ha Ri Engine](https://github.com/james-zedd/shu-ha-ri--engine), a mobile app for learning through question packs.
 
-It is a Next.js app with [Static Export](https://nextjs.org/docs/app/guides/static-exports) configured.
+Built with [Next.js](https://nextjs.org/docs) and [Fumadocs](https://fumadocs.dev), and exported as a fully static site.
 
-Run development server:
+## Run locally
+
+Requires Node 22 and npm.
 
 ```bash
+npm install
 npm run dev
-# or
-pnpm dev
-# or
-yarn dev
 ```
 
-Open http://localhost:3000 with your browser to see the result.
+Open http://localhost:3000 to see the site.
 
-## Explore
+## Commands
 
-In the project, you can see:
+| Command               | Description                                |
+| --------------------- | ------------------------------------------ |
+| `npm run dev`         | Start the development server.              |
+| `npm run build`       | Build the static site into `out/`.         |
+| `npm start`           | Serve the built site from `out/`.          |
+| `npm run lint`        | Run ESLint.                                |
+| `npm run types:check` | Generate route types and check TypeScript. |
 
-- `lib/source.ts`: Code for content source adapter, [`loader()`](https://fumadocs.dev/docs/headless/source-api) provides the interface to access your content.
-- `lib/layout.shared.tsx`: Shared options for layouts, optional but preferred to keep.
+## Writing content
 
-| Route                     | Description                                            |
-| ------------------------- | ------------------------------------------------------ |
-| `app/(home)`              | The route group for your landing page and other pages. |
-| `app/docs`                | The documentation layout and pages.                    |
-| `app/api/search/route.ts` | The Route Handler for search.                          |
-
-### Fumadocs MDX
-
-Collections are defined with the [Macro API](https://fumadocs.dev/docs/mdx/macro) in `lib/source.ts`.
-
-Read the [Introduction](https://fumadocs.dev/docs/mdx) for further details.
-
-## Learn More
-
-To learn more about Next.js and Fumadocs, take a look at the following
-resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [Fumadocs](https://fumadocs.dev) - learn about Fumadocs
+Pages are MDX files in `content/docs/`.
