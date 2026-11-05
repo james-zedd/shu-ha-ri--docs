@@ -1,0 +1,210 @@
+---
+title: Write a question pack
+description: Build a question pack from scratch that passes the app's validation, and get it into the curated list.
+audience: pack-author
+---
+
+A pack is a single JSON file that holds a set of questions on a subject. This guide walks through building a small one, and explains how to get questions that work well in a session.
+
+## Build your first pack
+
+A pack has some details about itself, followed by a list of questions. Here's a complete, valid pack with one question of each type:
+
+```json title="git-basics.json"
+{
+  "id": "git-basics",
+  "name": "Git Basics",
+  "description": "Everyday Git commands for checking and recording your work.",
+  "author": "Your Name",
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "updatedAt": "2026-11-05",
+  "questions": [
+    {
+      "id": "git-status-purpose",
+      "type": "multiple-choice",
+      "language": "git",
+      "category": "inspecting-changes",
+      "difficulty": 1,
+      "prompt": "What does <code>git status</code> show?",
+      "choices": [
+        "The state of the working tree and staging area",
+        "The list of past commits",
+        "The list of configured remotes",
+        "The contents of the last commit"
+      ],
+      "correctIndex": 0,
+      "explanation": "git status shows which changes are staged, which are unstaged, and which files Git isn't tracking.",
+      "source": "https://git-scm.com/docs/git-status"
+    },
+    {
+      "id": "git-commit-message-flag",
+      "type": "text-answer",
+      "language": "git",
+      "category": "recording-changes",
+      "difficulty": 1,
+      "prompt": "Which flag passes a commit message on the command line? <pre>git commit ___ \"Fix typo\"</pre> (include the hyphen)",
+      "correctAnswer": "-m",
+      "explanation": "The -m flag uses the given string as the commit message, instead of opening an editor.",
+      "source": "https://git-scm.com/docs/git-commit"
+    }
+  ]
+}
+```
+
+To make your own:
+
+1. Choose an `id` for the pack. It can only contain letters, numbers, hyphens and underscores, and it must stay the same across versions. The app uses it to match updates to the installed pack.
+2. Fill in `name`, `description` and `author`. These appear on the pack's card in the app.
+3. Set `schemaVersion` to `1` and `version` to `1.0.0`.
+4. Write your questions, following the sections below.
+5. Check that the file is valid JSON. Double quotes inside a string need a backslash, as in the example above.
+
+## Choose a question type
+
+There are two question types. Every question needs an `id`, `type`, `category`, `difficulty`, `prompt`, `explanation` and `source`.
+
+**`multiple-choice`** shows between two and six choices. `correctIndex` is the position of the right answer, counting from `0`.
+
+The app shuffles the choices in every session, so don't write a choice that depends on its position, such as "All of the above" or "Both A and B". You can list the correct answer anywhere in the array.
+
+**`text-answer`** gives the learner a text box, and compares what they type with `correctAnswer`.
+
+Multiple choice checks whether someone recognizes an answer, and text answers check whether they can recall it. A good pack uses both. The curated packs have between 50% and 70% multiple choice, which is a sensible range to start from.
+
+## Write text answers with format hints
+
+The app doesn't judge meaning. It compares the learner's answer with `correctAnswer`, and they must match exactly apart from these differences:
+
+- Upper and lower case
+- Spaces at the start and end, and repeated spaces between words
+- Curly quotes and straight quotes
+- En dashes, em dashes and hyphens
+- The `…` character and three periods
+
+A pack can only give one correct answer for each question. If a learner knows the answer but writes it differently, the app marks it wrong, and that teaches them nothing. A format hint in the prompt tells them what shape of answer you expect.
+
+| Prompt | Answer | Result |
+| --- | --- | --- |
+| Which CSS rule overrides normal cascade order? | `!important` | **Bad:** `important` would be marked wrong. |
+| Which flag, appended to a declaration, overrides normal cascade order? (include the exclamation mark) | `!important` | **Good:** the hint settles the punctuation. |
+| What is hoisting? | A long definition | **Bad:** nobody will type the same sentence. |
+| What is the term for the rendering mode triggered by a missing doctype? (two words) | `quirks mode` | **Good:** the answer is a short, fixed term. |
+| What does this log? `<pre>console.log(1 + 1);</pre>` | `2` | **Good:** the output has only one form, so it needs no hint. |
+
+Useful hints include `(one word)`, `(two words)`, `(the attribute name only)` and `(include the hyphen)`. You don't need to ask for a particular case, because the comparison ignores it.
+
+## Format code in questions
+
+You can use two tags in `prompt`, `explanation`, `choices` and `correctAnswer`:
+
+- `<code>` for inline code
+- `<pre>` for a code block
+
+The app removes common HTML tags from everything outside those two tags. Generic types such as `Partial<T>` are left alone, but if your subject is HTML, wrap any example tags in `<code>`.
+
+<Callout type="warn" title="Answers can't be HTML tags">
+  A `correctAnswer` such as `<div>` is removed, which leaves an empty answer, and the app skips the question. Wrapping it in `<code>` doesn't help, because the learner would then need to type the `<code>` tags too. Ask for the element name instead, with a hint such as `(the element name only, without angle brackets)`.
+</Callout>
+
+`name`, `description`, `author`, `category`, `language` and question `id` values are plain text, and can't contain `<` or `>`.
+
+## Organize questions
+
+The app builds its training filters from your questions.
+
+- **`category`** is required. Write it in lowercase, with words separated by single hyphens, such as `inspecting-changes`. The app displays this as "Inspecting Changes". Never use double hyphens, or a hyphen at the start or end. The validator accepts them, but the training screen hits an error when it tries to format the name.
+- **`difficulty`** is required. Use `1` for Easy, `2` for Medium or `3` for Hard.
+- **`language`** is optional. The language filter only appears when a pack has two or more languages, such as `css` and `scss`. The app labels `javascript`, `typescript`, `html` and `css` correctly, and capitalizes the first letter of anything else.
+
+## Cite a source
+
+Every question needs a `source` URL, which the app shows next to the explanation as a reference link. A source lets the learner read further and check your answer.
+
+- Link to the page that supports the answer, not a site's home page.
+- Prefer primary documentation, such as MDN or the project's own docs.
+- Open each link before you publish.
+
+The validator only checks that `source` is a well-formed `http` or `https` URL. It can't tell whether the page exists or says what you claim, so that check is up to you.
+
+## Version your pack
+
+| Field | Purpose | If it's missing |
+| --- | --- | --- |
+| `schemaVersion` | The version of the pack format. Use `1`. It must be a whole number from 1 to 1000. | The app uses `1`. |
+| `version` | The version of your content, in semver form such as `1.2.0`. | The app uses `0.0.0`. |
+| `updatedAt` | When you last changed the pack. The curated packs use dates such as `2026-09-05`. The app doesn't check its format. | The app uses the time of installation. |
+
+Always set `version`, because the curated list and updates both need valid semver.
+
+An update replaces the whole installed pack, and the new `version` must be higher than the installed one. If it isn't, the update fails with an error. Learners only see the update when the curated list has the new version too.
+
+## Rules the validator enforces
+
+| Field | Limit |
+| --- | --- |
+| Pack file | 5 MB |
+| Questions in a pack | 1 to 1,500 |
+| Pack `id` and question `id` | 100 characters |
+| `prompt` | 5,000 characters |
+| All other text fields | 2,048 characters |
+| `choices` | 2 to 6 |
+| `correctIndex` | A whole number that points to a real choice |
+| Question `id` | Unique within the pack |
+
+Pack `id` can't be `__proto__`, `constructor` or `prototype`.
+
+## Test your pack
+
+The app has no way to import a local file, because it only installs packs from its curated list. To test a pack before you submit it, you need a [development build](/docs/getting-started#development-builds-and-expo-go) of the app, pointed at your own list:
+
+1. Create a GitHub Gist for your pack, and copy its raw URL. The app only downloads from `gist.githubusercontent.com`, so other hosts won't work.
+2. Create a second Gist containing a list with one entry for your pack:
+
+   ```json title="curated-packs-list.json"
+   [
+     {
+       "id": "git-basics",
+       "name": "Git Basics",
+       "description": "Everyday Git commands for checking and recording your work.",
+       "author": "Your Name",
+       "url": "https://gist.githubusercontent.com/your-name/your-gist-id/raw/git-basics.json",
+       "version": "1.0.0"
+     }
+   ]
+   ```
+
+3. In your local copy of the engine, temporarily set `CURATED_PACKS_DIRECTORY_URL` in `src/data/fetch-curated-packs.ts` to the raw URL of that list.
+4. Open **View Packs**, install your pack, and try a session. Don't commit the URL change.
+
+The `id` and `version` in the list must match the ones in your pack file.
+
+## Read validation failures
+
+The app handles problems at two levels.
+
+**A problem with the pack stops the installation.** The pack's card shows the reason and a **Retry** button. Fix the file and try again.
+
+| Message | What to fix |
+| --- | --- |
+| `file is empty`, `file is too large` or `file is not valid JSON` | The file itself. Check it with a JSON validator. |
+| `pack is missing a valid id`, or the same for `name`, `description` or `author` | The field is missing, empty or too long. |
+| `pack id may only contain letters, numbers, hyphens, and underscores...` | Change the `id`. |
+| `pack name must be a plain string with no markup` | Remove `<` and `>`. The same applies to `description` and `author`. |
+| `pack must contain between 1 and 1500 questions` | The `questions` array is missing, empty or too long. |
+| `no valid questions found in pack` | Every question failed its checks. |
+| `pack version ... is not newer than the installed version ...` | Raise `version`. |
+
+**A problem with one question skips that question.** The rest of the pack installs, and the card shows a message such as "3 questions skipped as invalid."
+
+The app shows how many were skipped, but not which ones. To find them, temporarily log `result.skipped` in `runInstall` in `src/components/pack-actions.tsx`. Each entry has the question's position, its `id` and the reason. Always aim for no skipped questions before you submit.
+
+## Submit your pack
+
+1. Host the pack on a public GitHub Gist.
+2. Open a pull request against the `dev` branch of [`shu-ha-ri--engine`](https://github.com/james-zedd/shu-ha-ri--engine), adding your pack to `src/data/curated-packs-list.ts`.
+3. Respond to any review feedback.
+
+The app doesn't read `curated-packs-list.ts` directly. It reads a copy held in a separate Gist, which the maintainer updates by hand after merging. Your pack appears in the app once that happens, without an app release.
+
+This process isn't automated yet, and it may change.

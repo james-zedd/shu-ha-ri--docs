@@ -1,0 +1,133 @@
+---
+title: Architecture overview
+description: How Shu Ha Ri Engine is built, covering its screens, theming, pack loading and stored data.
+audience: contributor
+---
+
+Shu Ha Ri Engine is an Expo app written in TypeScript, using Expo Router for navigation. It has no backend. Packs are static JSON files on GitHub Gists, and everything else stays on the device.
+
+Paths on this page are relative to the root of the [engine repo](https://github.com/james-zedd/shu-ha-ri--engine).
+
+## Project layout
+
+| Folder | Holds |
+| --- | --- |
+| `src/app` | Screens. Each file is a route. |
+| `src/components` | Shared UI, including the question types in `question-modules` |
+| `src/data` | Pack fetching, validation, installation and filtering |
+| `src/hooks` | Theme, settings and activity hooks |
+| `src/constants` | Colours, fonts and spacing |
+| `packs` | Source copies of the curated packs |
+
+## Screens and routing
+
+Expo Router builds the routes from the files in `src/app`. The root layout, `src/app/_layout.tsx`, loads the fonts, sets up the theme and defines a single `Stack` navigator. All screens sit in that stack, and the home screen links to each one.
+
+| Route | File | Purpose |
+| --- | --- | --- |
+| `/` | `src/app/(tabs)/index.tsx` | Home screen, with links to everything else |
+| `/training` | `src/app/training.tsx` | Choose a pack and filters |
+| `/session` | `src/app/session.tsx` | Answer questions, and see the results |
+| `/packs` | `src/app/packs.tsx` | Browse, install, update and delete packs |
+| `/storage` | `src/app/storage.tsx` | Days used and settings |
+| `/about` | `src/app/about.tsx` | The Shu Ha Ri concept, privacy and contributing |
+
+The `(tabs)` group has a single screen, and its layout renders the home screen directly, so the app has no tab bar.
+
+The training screen passes the session's choices to `/session` as route parameters: `pack`, `language`, `difficulties`, `categories` and `count`. The session screen then loads the pack from disk, filters and shuffles the questions, and shuffles each question's choices. Answers are kept in component state, so they're gone when the screen closes.
+
+Each question type has its own component in `src/components/question-modules`. `QuestionModule` in `session.tsx` picks the right one using the question's `type`.
+
+## Theming
+
+The app follows the device's colour scheme, and `app.json` sets `userInterfaceStyle` to `automatic`. There's no in-app override yet, as that's tracked in [engine issue #70](https://github.com/james-zedd/shu-ha-ri--engine/issues/70).
+
+The colour scheme resolves like this:
+
+1. `useColorScheme` in `src/hooks` reports the device setting. The web version, `use-color-scheme.web.ts`, returns `light` until the page has hydrated, to support static rendering.
+2. `useTheme` in `src/hooks/use-theme.ts` picks the palette from `Colors` in `src/constants/theme.ts`. If the scheme is `unspecified`, it uses `light`.
+3. `ThemedText` and `ThemedView` apply colours by token name, such as `textSecondary` or `backgroundElement`.
+
+`src/app/_layout.tsx` also calls React Native's `useColorScheme` directly, to pass `DarkTheme` or `DefaultTheme` to the navigator. Any future override needs to change this as well as `useTheme`.
+
+To add a colour, define it in both the `light` and `dark` palettes.
+
+## From fetch to install
+
+A pack reaches the device in two stages. The app fetches the directory of curated packs when you open the Packs screen, and it only downloads a pack when you select **Install** or **Update**.
+
+```text
+ GitHub Gists                        Device
+ ------------                        ------
+
+ curated-packs-list.json
+        |
+        |  opening the Packs screen
+        v
+ fetchCuratedPacks  ----------->  parseCuratedPacksDirectory
+                                  (skips malformed entries)
+                                         |
+                                         v
+                                  Packs screen compares versions
+                                  with listInstalledPacks
+                                  (no per-pack network calls)
+                                         |
+                                         |  selecting Install or Update
+                                         v
+ <pack>.json  ----------------->  fetchPackContent
+                                  (host check, 15s timeout, 5 MB limit)
+                                         |
+                                         v
+                                  installPack
+                                    1. parsePackJson
+                                    2. validatePack
+                                       (rejects the pack, or skips
+                                        invalid questions)
+                                    3. requireNewerVersion
+                                       (only if already installed)
+                                    4. Write the cleaned pack
+                                         |
+                                         v
+                                  <documents>/packs/<id>.json
+                                         |
+                                         v
+                                  Training and session screens
+```
+
+| Step | File | Notes |
+| --- | --- | --- |
+| Fetch the directory | `src/data/fetch-curated-packs.ts` | `CURATED_PACKS_DIRECTORY_URL` is the source of truth. A malformed entry is skipped, so it can't break the whole screen. |
+| Show status | `src/app/packs.tsx` | `derivePackStatus` compares the directory's `version` with the installed pack's. |
+| Download | `src/data/fetch-pack-content.ts` | Only allows HTTPS URLs on `gist.githubusercontent.com`, using `isAllowedPackUrl` in `src/data/pack-url.ts`. |
+| Validate | `src/data/validate-pack.ts` | Returns a cleaned pack, plus the list of skipped questions. |
+| Clean text | `src/data/sanitize-string.ts` | Removes control characters, invisible characters and HTML tags, keeping `<pre>` and `<code>`. |
+| Install | `src/data/install-pack.ts` | `installPack` is the only way to write a pack. It decides for itself whether the version check applies, so a same-`id` file can't skip it. |
+
+`src/data/curated-packs-list.ts` isn't part of this flow, because the app never reads it. It's the file contributors change in pull requests, and the maintainer copies changes to the directory Gist by hand. This lets the list change without an app release.
+
+Installed packs are read straight from disk, without running validation again. `listInstalledPacks` skips any file it can't read, so one bad file can't break the training screen.
+
+## Stored data
+
+The app stores data in two places.
+
+**AsyncStorage** holds small values:
+
+| Key | Value | Hook |
+| --- | --- | --- |
+| `settings:immediate-feedback` | `"true"` or `"false"`. No key means on. | `src/hooks/use-immediate-feedback.ts` |
+| `day-counter:used-dates` | JSON array of local dates, such as `["2026-11-05"]` | `src/hooks/use-day-counter.ts` |
+
+**The file system** holds packs, using `expo-file-system`. Each installed pack is a JSON file at `packs/<id>.json` in the app's document directory. The `id` becomes part of a file name, and `isSafePackId` limits it to letters, numbers, hyphens and underscores.
+
+## Where to make a change
+
+| Change | Where |
+| --- | --- |
+| Add a screen | Add a file in `src/app`, then add a `Stack.Screen` in `src/app/_layout.tsx` and a link from the home screen. |
+| Add a setting | Add a hook in `src/hooks`, following `use-immediate-feedback.ts`, then add a row in `src/app/storage.tsx`. |
+| Add a question type | Add a component and type in `src/components/question-modules`, add it to the `Question` union in `src/data/questions.ts`, add a branch to `validateQuestion`, and handle it in `QuestionModule` and `handleSubmit` in `src/app/session.tsx`. |
+| Change a validation limit | Edit the constants at the top of `src/data/validate-pack.ts`, then regenerate the pack reference. |
+| Change how text answers are compared | Edit `normalizeAnswer` in `src/components/question-modules/text-answer.tsx`. |
+| Change or add a colour | Edit `Colors` in `src/constants/theme.ts`. |
+| Add a curated pack | Add an entry to `src/data/curated-packs-list.ts`, then mirror it to the directory Gist. See [Write a question pack](/docs/pack-authoring#submit-your-pack). |
