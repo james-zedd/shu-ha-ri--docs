@@ -6,7 +6,7 @@ Built with [Next.js](https://nextjs.org/docs) and [Fumadocs](https://fumadocs.de
 
 ## Run locally
 
-Requires Node 22 and npm.
+Requires Node 24 and npm.
 
 ```bash
 npm install
@@ -27,4 +27,18 @@ Open http://localhost:3000 to see the site.
 
 ## Writing content
 
-Pages are MDX files in `content/docs/`.
+Pages are MDX files in `content/docs/`. Each page starts with frontmatter, which is checked by the schema in `lib/source.ts`. If a page has a missing or invalid field, `npm run build` fails.
+
+| Field         | Required | Value                                                        |
+| ------------- | -------- | ------------------------------------------------------------ |
+| `title`       | Yes      | The page title.                                              |
+| `description` | Yes      | A one-sentence summary. It can't be empty.                   |
+| `audience`    | Yes      | Who the page is for: `user`, `pack-author` or `contributor`. |
+
+```yaml
+---
+title: Write a question pack
+description: Build a question pack that passes the app's validation.
+audience: pack-author
+---
+```
