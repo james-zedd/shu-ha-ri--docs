@@ -1,0 +1,60 @@
+---
+title: Settings and stored data
+description: Each setting in the app, and what the app keeps on your device.
+audience: user
+---
+
+To open this screen, select **Storage Data and Settings** on the home screen.
+
+## Settings
+
+| Setting | Default | What it does |
+| --- | --- | --- |
+| **Show answer after each question** | On | Controls when you see feedback during a session. |
+
+### Show answer after each question
+
+Also known as immediate feedback.
+
+- **On:** after you submit an answer, the app shows whether you were right, the correct answer, an explanation and a reference link. You then continue to the next question.
+- **Off:** the session moves to the next question as soon as you submit. You see the same feedback for every question on the results screen.
+
+The results screen appears at the end of a session in both modes.
+
+The app saves your choice immediately, and it applies to the next session you start.
+
+### Appearance
+
+<Callout type="warn" title="Not available yet">
+  An in-app Appearance setting (System, Light or Dark) is planned in [engine issue #70](https://github.com/james-zedd/shu-ha-ri--engine/issues/70). For now, the app always follows your device's light or dark mode.
+</Callout>
+
+## Activity
+
+The same screen shows **Days used**: the number of different days on which you've finished a session. A session you leave before the end doesn't count. It's a plain total, so missing a day doesn't reset anything.
+
+## What's stored on your device
+
+Everything the app keeps stays on your device. There's no account, and nothing is sent to a server.
+
+| Data | What it holds | How to remove it |
+| --- | --- | --- |
+| Installed packs | A copy of each pack you've installed | Select **Delete** on the pack in **View Packs** |
+| Days used | The local date of each day you finished a session | Uninstall the app |
+| Show answer after each question | Your on or off choice | Uninstall the app |
+
+The app has no in-app control to reset Days used or restore the default setting. On Android, you can also clear the app's storage in your device settings.
+
+Deleting a pack removes it from your device, and you'll need to download it again to use it. It doesn't affect Days used.
+
+Your answers and scores aren't stored. They exist only in memory during a session, and they're gone when you leave the results screen.
+
+## When the app uses the network
+
+The app only connects to the internet in these cases:
+
+- **Opening View Packs:** it fetches the list of curated packs.
+- **Selecting Install or Update:** it downloads that pack.
+- **Selecting a reference link:** it opens the question's source in your browser.
+
+Training doesn't use the network, so installed packs work offline.

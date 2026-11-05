@@ -1,0 +1,114 @@
+---
+title: Getting started
+description: What Shu Ha Ri Engine does, and how to run it from a fresh clone.
+audience: contributor
+---
+
+Shu Ha Ri Engine helps you improve at a subject through regular practice of its fundamentals. There are no accounts, ads, streaks or trophies. Your answers aren't recorded after a session ends, so the only reward is getting better at the subject.
+
+## The Shu Ha Ri model
+
+Shu Ha Ri is a Japanese concept that describes three stages of learning. It's widely attributed to the tea ceremony master Sen no Rikyū, and has since been applied to martial arts, software development and other skills.
+
+| Stage | Meaning |
+| --- | --- |
+| **Shu (守)** | Learn the fundamentals and follow the rules, through imitation and repetition. |
+| **Ha (破)** | Start to break from strict tradition, experimenting while still respecting the core principles. |
+| **Ri (離)** | The teachings are internalized, and you can express your own style beyond the original forms. |
+
+The app is built for the repeated practice of Shu. A good routine is to open it once a day and practise as much as you can that day.
+
+## How the app works
+
+1. On the home screen, select **View Packs** and install a pack. Packs are the question sets the app trains you on.
+2. Select **Start Training** and choose a pack.
+3. Optionally filter by language, difficulty and category, then choose how many questions you want.
+4. Work through the session. At the end, you can review every question with its explanation and a reference link.
+
+Only downloading packs needs an internet connection. Everything else works offline.
+
+## Run the app locally
+
+### Prerequisites
+
+| Tool | Needed for |
+| --- | --- |
+| Node.js 22 or later | Everything |
+| npm | Installing dependencies. The repo uses `package-lock.json`, so don't use yarn or pnpm. |
+| Latest Xcode | iOS builds. These need a Mac. |
+| Latest Android Studio and SDK | Android builds |
+| Watchman | Recommended on macOS, for Metro's file watching |
+
+The app uses Expo SDK 57. You don't need to install Expo globally, because `npx` runs the version in the project.
+
+### Install and run
+
+Clone the repo and install its dependencies:
+
+```bash
+git clone https://github.com/james-zedd/shu-ha-ri--engine.git
+cd shu-ha-ri--engine
+npm install
+```
+
+Then build and start the app on a simulator, an emulator or a connected device:
+
+```bash
+npx expo run:ios
+```
+
+```bash
+npx expo run:android
+```
+
+The first build is slow, because it compiles the native project. On iOS it also runs CocoaPods for you. When it finishes, the app opens and connects to the Metro bundler.
+
+Once a development build is installed, you only need Metro for later sessions:
+
+```bash
+npm start
+```
+
+### Check that it works
+
+1. The home screen shows **Start Training**, **View Packs**, **Storage Data and Settings** and **About Shu Ha Ri**.
+2. **View Packs** lists the curated packs. This needs an internet connection.
+3. Install a pack, then select **Start Training** and complete a short session.
+
+## Development builds and Expo Go
+
+**Expo Go isn't supported.** Expo Go is a prebuilt app with a fixed set of native modules, so it can't run a project that needs its own native code. This app depends on `expo-dev-client` and on native-only APIs, including Reanimated 4 with Worklets and `expo-symbols`.
+
+Instead, you use a development build: your own version of the app, compiled with the project's native code, which loads JavaScript from Metro.
+
+### When to rebuild
+
+| Change | Rebuild needed? |
+| --- | --- |
+| Editing TypeScript or React code | No. Metro reloads it. |
+| Installing a package that has only JavaScript | No |
+| Adding or upgrading a package with native code | Yes |
+| Changing native settings or plugins in `app.json` | Yes |
+| Upgrading the Expo SDK | Yes |
+
+A native module is compiled into the app binary, so Metro can't deliver it. If you add one without rebuilding, the app fails when it tries to load the module. To rebuild, run `npx expo run:ios` or `npx expo run:android` again.
+
+### Cloud builds
+
+You can build a development client with EAS Build instead of compiling locally. This needs EAS CLI 21.2.0 or later, and an Expo account with access to the project. `eas.json` defines these profiles:
+
+| Profile | Use |
+| --- | --- |
+| `development` | Development client for a device |
+| `development-simulator` | Development client for the iOS Simulator |
+| `preview` | Internal distribution build |
+| `production` | Store build |
+
+If you install a development client built with EAS, you don't need CocoaPods on your machine.
+
+## Next steps
+
+- [Write a question pack](/docs/pack-authoring)
+- [Read how the app is built](/docs/architecture)
+
+To contribute code, create a branch and open a pull request against `dev`. The engine repo doesn't accept pull requests to `main`.
