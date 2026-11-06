@@ -118,7 +118,7 @@ The app stores data in two places.
 | `settings:immediate-feedback` | `"true"` or `"false"`. No key means on. | `src/hooks/use-immediate-feedback.ts` |
 | `day-counter:used-dates` | JSON array of local dates, such as `["2026-11-05"]` | `src/hooks/use-day-counter.ts` |
 
-**The file system** holds packs, using `expo-file-system`. Each installed pack is a JSON file at `packs/<id>.json` in the app's document directory. The `id` becomes part of a file name, and `isSafePackId` limits it to letters, numbers, hyphens and underscores.
+**The file system** holds packs, using `expo-file-system`. Each installed pack is a JSON file at `packs/<id>.json` in the app's document directory. The `id` becomes part of a filename, and `isSafePackId` limits it to letters, numbers, hyphens and underscores.
 
 ## Where to make a change
 

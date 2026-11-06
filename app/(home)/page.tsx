@@ -14,7 +14,7 @@ const sections = [
   },
   {
     title: 'Reference',
-    description: 'Settings, and what the app stores on your device.',
+    description: 'The pack format, settings and stored data.',
     href: '/docs/reference/settings',
   },
   {

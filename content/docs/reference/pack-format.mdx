@@ -1,0 +1,118 @@
+---
+title: Pack format reference
+description: Every field and limit in the question pack format, generated from the engine source.
+audience: pack-author
+---
+
+> This page is generated from [engine commit `78306d1`](https://github.com/james-zedd/shu-ha-ri--engine/tree/78306d165bb6a75839d1f12f01a7e103494a2362). Don't edit it by hand. To update it, run `npm run generate:reference`.
+
+For a walkthrough, see [Write a question pack](/docs/pack-authoring).
+
+## Pack fields
+
+| Field | Type | Required | Default |
+| --- | --- | --- | --- |
+| `id` | `string` | Yes | — |
+| `name` | `string` | Yes | — |
+| `description` | `string` | Yes | — |
+| `author` | `string` | Yes | — |
+| `schemaVersion` | `number` | No | `1` |
+| `version` | `string` | No | `"0.0.0"` |
+| `updatedAt` | `string` | No | `new Date().toISOString()` |
+| `questions` | `Question[]` | Yes | — |
+
+A pack `id` must match `/^[a-zA-Z0-9_-]+$/`, and it can't be any of these: `__proto__`, `constructor`, `prototype`.
+
+## Question fields
+
+The app supports 2 question types. A question with any other `type` is skipped.
+
+### `multiple-choice`
+
+| Field | Type | Required | Default |
+| --- | --- | --- | --- |
+| `id` | `string` | Yes | — |
+| `type` | `"multiple-choice"` | Yes | — |
+| `prompt` | `string` | Yes | — |
+| `choices` | `string[]` | Yes | — |
+| `correctIndex` | `number` | Yes | — |
+| `language` | `string` | No | — |
+| `explanation` | `string` | Yes | — |
+| `source` | `string` | Yes | — |
+| `category` | `string` | Yes | — |
+| `difficulty` | `number` | Yes | — |
+
+### `text-answer`
+
+| Field | Type | Required | Default |
+| --- | --- | --- | --- |
+| `id` | `string` | Yes | — |
+| `type` | `"text-answer"` | Yes | — |
+| `prompt` | `string` | Yes | — |
+| `correctAnswer` | `string` | Yes | — |
+| `language` | `string` | No | — |
+| `explanation` | `string` | Yes | — |
+| `source` | `string` | Yes | — |
+| `category` | `string` | Yes | — |
+| `difficulty` | `number` | Yes | — |
+
+`difficulty` must be one of `1`, `2`, `3`.
+
+## Limits
+
+| Limit | Value |
+| --- | --- |
+| Largest pack file, in bytes | 5,242,880 (5 MB) |
+| Fewest `choices` | 2 |
+| Most `choices` | 6 |
+| Most questions in a pack | 1,500 |
+| Longest value for any other text field | 2,048 |
+| Longest `prompt` | 5,000 |
+| Longest pack or question `id` | 100 |
+| Highest `schemaVersion` | 1,000 |
+
+## Example
+
+These questions come from `packs/css-scss-fundamentals.json` in the engine repo, with one question of each type.
+
+```json
+{
+  "id": "css-scss-fundamentals",
+  "name": "CSS & SCSS Fundamentals",
+  "description": "240 multiple-choice and text-answer questions covering core CSS and SCSS, with deep coverage of flexbox and grid: selectors, the cascade and specificity, the box model, positioning, typography, colors, units, custom properties, transitions and transforms, responsive design, and SCSS variables, nesting, mixins, @extend, control flow, modules, functions, and maps.",
+  "author": "James Zedd",
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "updatedAt": "2026-09-23",
+  "questions": [
+    {
+      "id": "u8jzPde0IgxLd6Gn",
+      "type": "multiple-choice",
+      "language": "css",
+      "category": "selectors",
+      "difficulty": 1,
+      "prompt": "Which combinator selects only elements that are a direct child of another element?",
+      "choices": [
+        "A space, the descendant combinator",
+        "The > child combinator",
+        "The + adjacent sibling combinator",
+        "The ~ general sibling combinator"
+      ],
+      "correctIndex": 1,
+      "explanation": "The child combinator > matches only elements that are immediate children of the first element, whereas a space matches descendants at any depth.",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/Child_combinator"
+    },
+    {
+      "id": "IhKtJ0RlgLKOmxgJ",
+      "type": "text-answer",
+      "language": "css",
+      "category": "selectors",
+      "difficulty": 1,
+      "prompt": "Which single character is the CSS universal selector, matching elements of any type? (one character)",
+      "correctAnswer": "*",
+      "explanation": "The universal selector * matches any element, and is commonly seen in resets like * { box-sizing: border-box; }.",
+      "source": "https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/Universal_selectors"
+    }
+  ]
+}
+```

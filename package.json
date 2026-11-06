@@ -7,7 +7,10 @@
     "dev": "next dev",
     "start": "serve out",
     "types:check": "next typegen && tsc --noEmit",
-    "lint": "eslint"
+    "lint": "eslint",
+    "lint:content": "markdownlint-cli2",
+    "test": "node --test \"scripts/*.test.mjs\"",
+    "generate:reference": "node scripts/generate-pack-reference.mjs"
   },
   "dependencies": {
     "cn": "^0.5.0",
@@ -28,6 +31,7 @@
     "@types/react-dom": "^19.3.0",
     "eslint": "^9.39.4",
     "eslint-config-next": "16.4.2",
+    "markdownlint-cli2": "^0.24.0",
     "postcss": "^8.5.31",
     "serve": "^14.2.6",
     "tailwindcss": "^4.3.3",
