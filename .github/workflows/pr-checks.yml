@@ -32,5 +32,26 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Test
+        run: npm test
+
       - name: Build
         run: npm run build
+
+      - name: Lint Markdown
+        if: ${{ !cancelled() }}
+        uses: DavidAnson/markdownlint-cli2-action@v25
+
+      - name: Restore the link check cache
+        if: ${{ !cancelled() }}
+        uses: actions/cache@v6
+        with:
+          path: .lycheecache
+          key: lychee-${{ github.sha }}
+          restore-keys: lychee-
+
+      - name: Check links
+        if: ${{ !cancelled() }}
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --config lychee.toml --no-progress 'content/docs/**/*.mdx' README.md

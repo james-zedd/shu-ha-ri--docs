@@ -1,0 +1,15 @@
+# Resolve /docs/... links against the content source.
+root_dir = "content"
+index_files = ["index.mdx"]
+fallback_extensions = ["mdx"]
+include_fragments = "anchor-only"
+
+# External sites can fail for reasons unrelated to a pull request.
+cache = true
+max_cache_age = "1d"
+max_retries = 3
+retry_wait_time = 2
+timeout = 20
+
+# Known false positives. localhost only exists while the dev server is running.
+exclude = ['^https?://localhost']

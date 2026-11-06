@@ -58,7 +58,7 @@ To make your own:
 2. Fill in `name`, `description` and `author`. These appear on the pack's card in the app.
 3. Set `schemaVersion` to `1` and `version` to `1.0.0`.
 4. Write your questions, following the sections below.
-5. Check that the file is valid JSON. Double quotes inside a string need a backslash, as in the example above.
+5. Check that the file is valid JSON. Double quotes inside a string need a backslash, as in the example.
 
 ## Choose a question type
 
@@ -66,7 +66,7 @@ There are two question types. Every question needs an `id`, `type`, `category`, 
 
 **`multiple-choice`** shows between two and six choices. `correctIndex` is the position of the right answer, counting from `0`.
 
-The app shuffles the choices in every session, so don't write a choice that depends on its position, such as "All of the above" or "Both A and B". You can list the correct answer anywhere in the array.
+The app shuffles the choices in every session, so don't write a choice that depends on its position. Avoid choices such as "Both A and B" and "The first two options" for this reason. You can list the correct answer anywhere in the array.
 
 **`text-answer`** gives the learner a text box, and compares what they type with `correctAnswer`.
 
@@ -88,7 +88,7 @@ A pack can only give one correct answer for each question. If a learner knows th
 | --- | --- | --- |
 | Which CSS rule overrides normal cascade order? | `!important` | **Bad:** `important` would be marked wrong. |
 | Which flag, appended to a declaration, overrides normal cascade order? (include the exclamation mark) | `!important` | **Good:** the hint settles the punctuation. |
-| What is hoisting? | A long definition | **Bad:** nobody will type the same sentence. |
+| What is hoisting? | A long definition | **Bad:** nobody types the same sentence. |
 | What is the term for the rendering mode triggered by a missing doctype? (two words) | `quirks mode` | **Good:** the answer is a short, fixed term. |
 | What does this log? `<pre>console.log(1 + 1);</pre>` | `2` | **Good:** the output has only one form, so it needs no hint. |
 
@@ -113,7 +113,7 @@ The app removes common HTML tags from everything outside those two tags. Generic
 
 The app builds its training filters from your questions.
 
-- **`category`** is required. Write it in lowercase, with words separated by single hyphens, such as `inspecting-changes`. The app displays this as "Inspecting Changes". Never use double hyphens, or a hyphen at the start or end. The validator accepts them, but the training screen hits an error when it tries to format the name.
+- **`category`** is required. Write it in lowercase, with words separated by single hyphens, such as `inspecting-changes`. The app shows `inspecting-changes` as "Inspecting Changes" on the training screen. Never use double hyphens, or a hyphen at the start or end. The validator accepts them, but the training screen hits an error when it tries to format the name.
 - **`difficulty`** is required. Use `1` for Easy, `2` for Medium or `3` for Hard.
 - **`language`** is optional. The language filter only appears when a pack has two or more languages, such as `css` and `scss`. The app labels `javascript`, `typescript`, `html` and `css` correctly, and capitalizes the first letter of anything else.
 
@@ -153,6 +153,8 @@ An update replaces the whole installed pack, and the new `version` must be highe
 | Question `id` | Unique within the pack |
 
 Pack `id` can't be `__proto__`, `constructor` or `prototype`.
+
+For every field and its exact type, see the [Pack format reference](/docs/reference/pack-format).
 
 ## Test your pack
 
